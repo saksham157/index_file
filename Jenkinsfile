@@ -1,25 +1,24 @@
-pipeline {
-    agent any
+stage('Deploy to Apache') {
+    steps {
+        sh '''
+        set -xe
 
-    stages {
+        echo "===== WORKSPACE FILE ====="
+        pwd
+        ls -l
+        echo "First lines of workspace index:"
+        head -n 5 index.html || true
 
-        stage('Checkout Code') {
-            steps {
-                git branch: 'main',
-                    url: 'https://github.com/saksham157/index_file.git'
-            }
-        }
+        echo "===== COPYING ====="
+        sudo install -m 644 index.html /var/www/html/index.html
 
-        stage('Deploy to Apache') {
-            steps {
-                sh '''
-                set -e
-                echo "Deploying latest code..."
+        echo "===== APACHE FILE ====="
+        sudo ls -l /var/www/html/index.html
+        echo "First lines of apache index:"
+        sudo head -n 5 /var/www/html/index.html
 
-                sudo install -m 644 index.html /var/www/html/index.html
-                sudo systemctl reload apache2
-                '''
-            }
-        }
+        echo "===== RELOAD ====="
+        sudo systemctl reload apache2
+        '''
     }
 }
