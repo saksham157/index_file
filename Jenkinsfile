@@ -2,13 +2,22 @@ pipeline {
     agent any
 
     stages {
+
+        stage('Checkout Code') {
+            steps {
+                git branch: 'main',
+                    url: 'https://github.com/saksham157/index_file.git'
+            }
+        }
+
         stage('Deploy to Apache') {
             steps {
                 sh '''
-                cd /var/www/html
-                sudo rm -f index.html
-                sudo cp index.html /var/www/html/
-                sudo systemctl restart apache2
+                set -e
+                echo "Deploying latest code..."
+
+                sudo install -m 644 index.html /var/www/html/index.html
+                sudo systemctl reload apache2
                 '''
             }
         }
